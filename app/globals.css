@@ -1,26 +1,60 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* 디자인 토큰: design/README.md 의 Design Tokens 를 그대로 옮김 */
+@theme {
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+
+  --color-ink: oklch(0.22 0.01 80);
+  --color-muted: oklch(0.45 0.01 80);
+  --color-subtle: oklch(0.5 0.01 80);
+  --color-faint: oklch(0.6 0.01 80);
+  --color-surface: oklch(0.985 0.004 80);
+  --color-fill: oklch(0.95 0.006 80);
+  --color-line: oklch(0.92 0.006 80);
+  --color-line-soft: oklch(0.94 0.006 80);
+  --color-axis: oklch(0.9 0.006 80);
+  --color-hero: oklch(0.88 0.07 70);
+  --color-accent: oklch(0.62 0.14 45);
+  --color-accent-link: oklch(0.55 0.14 45);
+  --color-today-bar: oklch(0.65 0.15 50);
+  --color-today-bar-now: oklch(0.55 0.17 45);
+  --color-yesterday-bar: oklch(0.85 0.01 250);
+  --color-yesterday-line: oklch(0.62 0.03 250);
+  --color-yesterday-text: oklch(0.5 0.02 250);
+  --color-up: oklch(0.58 0.15 45);
+  --color-down: oklch(0.55 0.12 250);
+  --color-same: oklch(0.6 0.01 80);
+  --color-now-row: oklch(0.95 0.02 70);
+  --color-star-on: oklch(0.75 0.14 75);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  word-break: keep-all;
+}
+
+/* 하단 탭바·버튼 영역의 iOS 홈 인디케이터 여백 */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+.skeleton {
+  background: oklch(0 0 0 / 0.07);
+  border-radius: 8px;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
 }

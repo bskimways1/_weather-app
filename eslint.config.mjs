@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // 디자인 목업 런타임(구현 대상 아님)
+    "design/**",
   ]),
 ]);
 
