@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -63,6 +63,9 @@ export function MainScreen() {
     await Promise.all([reload(true), gpsMode ? locate() : null]);
   };
   const { pull, refreshing, ready, handlers } = usePullToRefresh(refresh);
+
+  // 현재 위치는 URL 에 좌표를 넣지 않는다 (링크 공유·방문 기록으로 위치가 새지 않게)
+  const detailHref = gpsMode || !place ? "/detail" : `/detail?${placeToQuery(place)}`;
 
   const hour = now?.hour ?? 0;
   const today = data?.today[hour];
@@ -156,7 +159,7 @@ export function MainScreen() {
         {weather.error && !data ? (
           <ErrorRetry message={weather.error} onRetry={() => void reload(true)} />
         ) : data && place ? (
-          <Link href={`/detail?${placeToQuery(place)}`} aria-label="시간대별 상세 비교 보기" className="block">
+          <Link href={detailHref} aria-label="시간대별 상세 비교 보기" className="block">
             <CompareBarChart data={data} nowHour={hour} />
           </Link>
         ) : (
@@ -170,7 +173,7 @@ export function MainScreen() {
             </p>
             {place && (
               <Link
-                href={`/detail?${placeToQuery(place)}`}
+                href={detailHref}
                 className="flex items-center gap-0.5 self-start text-[13px] font-semibold text-accent-link"
               >
                 시간대별로 자세히 보기 <ChevronRight size={14} />

@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { placeFromParts } from "./types";
+import { placeFromParts, roundCoord } from "./types";
+
+describe("roundCoord", () => {
+  it("소수 3자리(약 100m)로 반올림", () => {
+    expect(roundCoord(37.500612345)).toBe(37.501);
+    expect(roundCoord(127.036549)).toBe(127.037);
+    expect(roundCoord(-33.86784)).toBe(-33.868);
+  });
+});
 
 describe("placeFromParts", () => {
   it("시도는 줄여서 라벨을 만든다", () => {

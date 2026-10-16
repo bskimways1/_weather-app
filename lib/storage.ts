@@ -1,7 +1,12 @@
 "use client";
 
 import { useCallback, useSyncExternalStore } from "react";
-import type { Place } from "./geo/types";
+import { roundCoord, type Place } from "./geo/types";
+
+/** 저장하는 지역 좌표는 약 100m 단위로 반올림 (정밀 GPS 좌표를 남기지 않음) */
+function roundPlace(p: Place): Place {
+  return { ...p, lat: roundCoord(p.lat), lon: roundCoord(p.lon) };
+}
 
 /**
  * localStorage 상태. 같은 탭의 다른 컴포넌트에도 바로 반영되도록
@@ -78,7 +83,7 @@ export function useFavorites() {
   const add = useCallback((place: Place) => {
     const list = getFavorites();
     if (list.some((f) => f.id === place.id)) return;
-    write(FAV_KEY, [...list, place]);
+    write(FAV_KEY, [...list, roundPlace(place)]);
   }, []);
 
   const remove = useCallback((id: string) => {
@@ -137,5 +142,20 @@ export function useLastGps(): Place | null {
   return useStored<Place | null>(LAST_GPS_KEY, null);
 }
 export function saveLastGps(place: Place) {
-  write(LAST_GPS_KEY, place);
+  write(LAST_GPS_KEY, roundPlace(place));
 }
+
+/* ---------- 이전 버전에서 저장된 정밀 좌표 정리 (1회) ---------- */
+
+function migrateStoredCoords() {
+  try {
+    const gps = read<Place | null>(LAST_GPS_KEY, null);
+    if (gps) window.localStorage.setItem(LAST_GPS_KEY, JSON.stringify(roundPlace(gps)));
+    const favs = read<Place[]>(FAV_KEY, []);
+    if (favs.length) window.localStorage.setItem(FAV_KEY, JSON.stringify(favs.map(roundPlace)));
+  } catch {
+    // 저장소를 못 쓰면 정리할 것도 없다
+  }
+}
+
+if (typeof window !== "undefined") migrateStoredCoords();

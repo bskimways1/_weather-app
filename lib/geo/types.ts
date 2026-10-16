@@ -20,6 +20,14 @@ export interface GeoProvider {
   reverse(lat: number, lon: number): Promise<Place | null>;
 }
 
+/**
+ * GPS 좌표를 소수 3자리(약 100m)로 반올림한다. 폰 밖으로 나가는 위치는 모두 이 값을 쓴다.
+ * 날씨(약 1km 격자)와 동 이름 판별에는 충분한 정밀도다.
+ */
+export function roundCoord(v: number) {
+  return Math.round(v * 1000) / 1000;
+}
+
 export function placeId(lat: number, lon: number) {
   return `${lat.toFixed(3)},${lon.toFixed(3)}`;
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
 import { ChevronLeft } from "lucide-react";
@@ -59,7 +60,15 @@ export function DetailScreen() {
 
       <main className="flex-1 overflow-y-auto pb-safe">
         {error && !data && <ErrorRetry message={error} onRetry={() => void reload(true)} />}
-        {!data && !error &&
+        {!place && (
+          <div className="flex flex-col items-center gap-3 py-10 text-center text-[14px] text-muted">
+            현재 위치 정보가 없어요.
+            <Link href="/" className="flex h-11 items-center rounded-[10px] bg-ink px-4 font-bold text-white">
+              메인으로
+            </Link>
+          </div>
+        )}
+        {place && !data && !error &&
           Array.from({ length: 10 }, (_, i) => (
             <div key={i} className="flex h-12 items-center border-b border-line-soft px-6">
               <div className="skeleton h-4 w-full" />

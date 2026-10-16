@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
-import { placeId, type Place } from "@/lib/geo/types";
+import { placeId, roundCoord, type Place } from "@/lib/geo/types";
 import { saveLastGps, useLastGps } from "@/lib/storage";
 
 /**
@@ -72,7 +72,8 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
       setError(null);
       try {
         const pos = await getPosition();
-        const p = await reverse(pos.coords.latitude, pos.coords.longitude);
+        // 정밀 좌표는 폰 안에서만 쓰고, 서버에는 약 100m 단위로 반올림해서 보낸다
+        const p = await reverse(roundCoord(pos.coords.latitude), roundCoord(pos.coords.longitude));
         saveLastGps(p);
         setStatus("ready");
         return p;
