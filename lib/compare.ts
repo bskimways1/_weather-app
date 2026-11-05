@@ -13,6 +13,26 @@ export function diffAt(c: DayComparison, hour: number): number {
   return tempDiff(c.today[hour].temp, c.yesterday[hour].temp);
 }
 
+/** 지금 기온: 실시간 관측이 있으면 그 값, 없으면 이 시각(정시) 값 */
+export function currentTemp(c: DayComparison, hour: number): number {
+  return c.live?.temp ?? c.today[hour].temp;
+}
+
+/** 지금과 비교할 어제 기온: 실시간이면 어제 같은 분 관측, 없으면 어제 같은 정시 */
+export function yesterdayNowTemp(c: DayComparison, hour: number): number {
+  return c.live?.yesterdayTemp ?? c.yesterday[hour].temp;
+}
+
+/** 지금 기온과 어제 같은 시각의 차이 (메인·카드의 "어제보다 N°") */
+export function nowDiff(c: DayComparison, hour: number): number {
+  return tempDiff(currentTemp(c, hour), yesterdayNowTemp(c, hour));
+}
+
+/** 오늘 이 시각 값이 예보인지 (관측 구분이 없는 제공자면 false) */
+export function isForecastHour(c: DayComparison, hour: number): boolean {
+  return c.observedThroughHour != null && hour > c.observedThroughHour;
+}
+
 /** +3° / −2°(U+2212) / 같음 */
 export function formatDiff(d: number): string {
   if (d > 0) return `+${d}°`;

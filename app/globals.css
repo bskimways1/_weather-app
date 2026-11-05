@@ -58,3 +58,12 @@ body {
   border-radius: 8px;
   animation: skeleton-pulse 1.4s ease-in-out infinite;
 }
+
+/* 예보 막대: 관측 막대와 구분되게 바탕색 위에 빗금 */
+.bar-forecast {
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0 3px,
+    color-mix(in oklch, var(--color-surface) 55%, transparent) 3px 5px
+  );
+}

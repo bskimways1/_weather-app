@@ -1,14 +1,18 @@
 import { describe, expect, it } from "vitest";
 import {
+  currentTemp,
   dayStats,
   diffSentence,
   formatDiff,
+  isForecastHour,
   linearScale,
   localNow,
+  nowDiff,
   nowHourFor,
   shortDate,
   tempDiff,
   threeHourSlots,
+  yesterdayNowTemp,
 } from "./compare";
 import type { DayComparison, Hourly } from "./weather/types";
 
@@ -103,4 +107,34 @@ describe("threeHourSlots", () => {
 
 describe("shortDate", () => {
   it("MM/DD", () => expect(shortDate("2026-10-05")).toBe("10/05"));
+});
+
+describe("실시간 관측 (currentTemp / nowDiff / isForecastHour)", () => {
+  it("실시간이 없으면 정시 값으로 비교", () => {
+    const c = comparison();
+    expect(currentTemp(c, 9)).toBe(12);
+    expect(yesterdayNowTemp(c, 9)).toBe(10);
+    expect(nowDiff(c, 9)).toBe(2);
+    expect(isForecastHour(c, 20)).toBe(false);
+  });
+
+  it("실시간이 있으면 지금 관측과 어제 같은 분 관측으로 비교", () => {
+    const c: DayComparison = {
+      ...comparison(),
+      live: { temp: 13.8, observedAt: "2026-10-16T19:38", yesterdayTemp: 12.6, stations: [] },
+      observedThroughHour: 19,
+    };
+    expect(currentTemp(c, 19)).toBe(13.8);
+    expect(nowDiff(c, 19)).toBe(1); // 14 - 13
+    expect(isForecastHour(c, 19)).toBe(false);
+    expect(isForecastHour(c, 20)).toBe(true);
+  });
+
+  it("어제 같은 분 관측이 없으면 어제 정시 값", () => {
+    const c: DayComparison = {
+      ...comparison(),
+      live: { temp: 13.8, observedAt: "2026-10-16T19:38", yesterdayTemp: null, stations: [] },
+    };
+    expect(nowDiff(c, 19)).toBe(4); // 14 - 10
+  });
 });

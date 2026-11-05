@@ -11,7 +11,8 @@ import { StarButton } from "@/components/StarButton";
 import { TabBar } from "@/components/TabBar";
 import { usePullToRefresh } from "@/components/usePullToRefresh";
 import { WeatherIcon } from "@/components/WeatherIcon";
-import { dayStats, diffAt, diffSentence, nowHourFor } from "@/lib/compare";
+import { currentTemp, dayStats, diffSentence, nowDiff, nowHourFor, yesterdayNowTemp } from "@/lib/compare";
+import type { LiveObservation } from "@/lib/weather/types";
 import { placeFromQuery, placeToQuery } from "@/lib/placeQuery";
 import { getFavorites, isOnboarded, useFavorites } from "@/lib/storage";
 import { useComparison } from "@/lib/useWeather";
@@ -70,7 +71,7 @@ export function MainScreen() {
   const hour = now?.hour ?? 0;
   const today = data?.today[hour];
   const yesterday = data?.yesterday[hour];
-  const d = data ? diffAt(data, hour) : 0;
+  const d = data ? nowDiff(data, hour) : 0;
   const tStats = data ? dayStats(data.today) : null;
   const yStats = data ? dayStats(data.yesterday) : null;
 
@@ -91,8 +92,10 @@ export function MainScreen() {
           </div>
 
           <div className="flex items-end justify-between">
-            {today ? (
-              <div className="text-[120px] leading-[0.9] font-extralight tracking-[-0.05em]">{Math.round(today.temp)}°</div>
+            {data && today ? (
+              <div className="text-[120px] leading-[0.9] font-extralight tracking-[-0.05em]">
+                {Math.round(currentTemp(data, hour))}°
+              </div>
             ) : (
               <div className="skeleton my-2 h-[92px] w-[190px] bg-black/10" />
             )}
@@ -114,15 +117,16 @@ export function MainScreen() {
           </div>
 
           <div className="flex min-h-[38px] items-center gap-2.5">
-            {today && yesterday ? (
+            {data && today && yesterday ? (
               <>
                 <div className="rounded-full bg-ink px-3.5 py-2 text-[15px] font-bold text-white">{diffSentence(d)}</div>
-                <div className="text-[13px]">어제 {Math.round(yesterday.temp)}°</div>
+                <div className="text-[13px]">어제 {Math.round(yesterdayNowTemp(data, hour))}°</div>
               </>
             ) : (
               <div className="skeleton h-[38px] w-[150px] rounded-full bg-black/10" />
             )}
           </div>
+          {data?.live && <LiveBadge live={data.live} />}
         </div>
       </header>
 
@@ -153,6 +157,12 @@ export function MainScreen() {
               <span className="h-2.5 w-2.5 rounded-[3px] bg-today-bar" />
               오늘
             </span>
+            {data?.observedThroughHour != null && (
+              <span className="flex items-center gap-1.5">
+                <span className="bar-forecast h-2.5 w-2.5 rounded-[3px] bg-today-bar" />
+                예보
+              </span>
+            )}
           </div>
         </div>
 
@@ -196,11 +206,35 @@ export function MainScreen() {
           </div>
         )}
 
-        {data && <p className="mt-auto pt-4 text-[11px] text-faint">데이터 {data.source} · 어제 값은 모델 분석값, 오늘 값은 예보</p>}
+        {data && (
+          <p className="mt-auto pt-4 text-[11px] text-faint">
+            {data.live
+              ? "데이터 기상청 · 근처 관측소 실측을 거리 가중 평균, 남은 시간은 기상청 예보"
+              : `데이터 ${data.source} · 어제 값은 모델 분석값, 오늘 값은 예보`}
+          </p>
+        )}
       </main>
 
       <TabBar active={gpsMode ? "here" : null} />
     </div>
+  );
+}
+
+/** ● 실시간 · 19:38 관측 · 오전동 등 관측소 3곳 평균 */
+function LiveBadge({ live }: { live: LiveObservation }) {
+  const [first] = live.stations;
+  const where =
+    live.stations.length > 1
+      ? `${first.name} 등 관측소 ${live.stations.length}곳 평균`
+      : `${first.name} 관측소 ${first.km}km`;
+  return (
+    <p className="-mt-2 flex items-center gap-1.5 text-[12px] font-medium" aria-live="polite">
+      <span className="relative flex h-2 w-2">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-up opacity-60" />
+        <span className="relative inline-flex h-2 w-2 rounded-full bg-up" />
+      </span>
+      실시간 · {live.observedAt.slice(11, 16)} 관측 · {where}
+    </p>
   );
 }
 

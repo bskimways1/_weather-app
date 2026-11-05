@@ -5,8 +5,9 @@ import { nowHourFor } from "./compare";
 import type { LatLon } from "./weather/types";
 import type { DayComparison } from "./weather/types";
 
-/** 클라이언트 메모리 캐시: 같은 지점을 화면 전환마다 다시 받지 않도록 (10분) */
+/** 클라이언트 메모리 캐시: 같은 지점을 화면 전환마다 다시 받지 않도록 (10분, 실시간 관측은 1분) */
 const TTL = 10 * 60_000;
+const LIVE_TTL = 60_000;
 const memo = new Map<string, { at: number; data: DayComparison }>();
 
 function key(p: LatLon) {
@@ -15,7 +16,7 @@ function key(p: LatLon) {
 
 function fresh(k: string) {
   const hit = memo.get(k);
-  if (!hit || Date.now() - hit.at > TTL) return null;
+  if (!hit || Date.now() - hit.at > (hit.data.live ? LIVE_TTL : TTL)) return null;
   if (nowHourFor(hit.data).stale) return null; // 자정이 지났으면 다시
   return hit.data;
 }
@@ -78,6 +79,16 @@ export function useComparisons(points: LatLon[] | null) {
     document.addEventListener("visibilitychange", onVisible);
     return () => document.removeEventListener("visibilitychange", onVisible);
   }, [load]);
+
+  // 실시간 관측이면 화면이 켜져 있는 동안 1분마다 새로 받는다
+  const live = Boolean(state.data?.some((d) => d.live));
+  useEffect(() => {
+    if (!live) return;
+    const id = window.setInterval(() => {
+      if (document.visibilityState === "visible") void load(true);
+    }, LIVE_TTL);
+    return () => window.clearInterval(id);
+  }, [live, load]);
 
   return { ...state, reload: load };
 }

@@ -63,3 +63,4 @@
 - 구현: `lib/weather/kma-parse.ts`(해석·계산, 테스트) + `lib/weather/kma.ts`(호출·캐시·조립), `WEATHER_PROVIDER=kma`. 하늘 상태·낮밤은 Open-Meteo 값(관측소에 구름 정보 없음), 비·눈은 실제 강수 관측으로 바로잡는다. 기상청 호출이 실패하면 Open-Meteo 로 대신 보여준다.
   - 캐시: 최신 관측 1분, 지난 정시 관측(전국)은 하루, 단기예보 1시간, 초단기예보 몇 분. `/api/weather` 는 kma 일 때 1분.
   - 첫 호출은 전국 정시 관측 약 48회를 받아 수 초 걸린다(이후 캐시). Vercel 에서 실제 시간은 4단계에서 확인.
+- 화면(3단계): 지금 기온·"어제보다 N°"는 `live`(지금 관측 vs 어제 같은 분 관측)로, 시간대 막대·표는 정시 값으로 비교한다(`lib/compare.ts` 의 `currentTemp`·`nowDiff`·`isForecastHour`). 메인에 "● 실시간 · HH:MM 관측 · ○○ 등 관측소 N곳 평균", 오늘 예보 막대는 빗금(`.bar-forecast`), 상세는 "N시부터는 기상청 예보" 구분 줄과 예보 구간을 흐린 선으로. 실시간 자료가 있으면 화면이 켜진 동안 1분마다 다시 받는다(`lib/useWeather.ts`).

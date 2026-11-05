@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Search, X } from "lucide-react";
 import { TabBar } from "@/components/TabBar";
-import { diffAt, formatDiff, nowHourFor } from "@/lib/compare";
+import { currentTemp, formatDiff, nowDiff, nowHourFor } from "@/lib/compare";
 import type { Place } from "@/lib/geo/types";
 import { placeToQuery } from "@/lib/placeQuery";
 import { useFavorites, useRecentSearches } from "@/lib/storage";
@@ -152,7 +152,7 @@ export function SearchScreen({ liveSearch }: { liveSearch: boolean }) {
                       <span className="truncate text-[15px] font-semibold">{p.label}</span>
                       <span className="truncate text-[12px] text-subtle">
                         {p.sub}
-                        {w && ` · ${Math.round(w.today[h].temp)}° · 어제보다 ${formatDiff(diffAt(w, h))}`}
+                        {w && ` · ${Math.round(currentTemp(w, h))}° · 어제보다 ${formatDiff(nowDiff(w, h))}`}
                       </span>
                     </Link>
                     <button

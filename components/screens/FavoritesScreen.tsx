@@ -6,7 +6,7 @@ import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { useLocation } from "@/components/LocationProvider";
 import { StarButton } from "@/components/StarButton";
 import { TabBar } from "@/components/TabBar";
-import { dayStats, diffAt, diffSentence, nowHourFor, toneColor, toneSoftBg } from "@/lib/compare";
+import { currentTemp, dayStats, diffSentence, nowDiff, nowHourFor, toneColor, toneSoftBg } from "@/lib/compare";
 import type { Place } from "@/lib/geo/types";
 import { placeToQuery } from "@/lib/placeQuery";
 import { useFavorites } from "@/lib/storage";
@@ -167,7 +167,7 @@ function FavoriteCard({
 }) {
   const h = data ? nowHourFor(data).hour : 0;
   const now = data?.today[h];
-  const d = data ? diffAt(data, h) : 0;
+  const d = data ? nowDiff(data, h) : 0;
   const stats = data ? dayStats(data.today) : null;
 
   return (
@@ -183,7 +183,7 @@ function FavoriteCard({
           </div>
         </div>
         {now ? (
-          <div className="text-[40px] leading-none font-light">{Math.round(now.temp)}°</div>
+          <div className="text-[40px] leading-none font-light">{Math.round(currentTemp(data!, h))}°</div>
         ) : (
           <div className={`skeleton h-10 w-16 ${isGps ? "bg-white/15" : ""}`} />
         )}

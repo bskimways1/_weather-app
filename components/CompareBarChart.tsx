@@ -1,8 +1,8 @@
-import { diffAt, formatDiff, hourLabel, linearScale, threeHourSlots, toneColor } from "@/lib/compare";
+import { diffAt, formatDiff, hourLabel, isForecastHour, linearScale, threeHourSlots, toneColor } from "@/lib/compare";
 import type { DayComparison } from "@/lib/weather/types";
 
 /**
- * 1c 메인 시트의 나란한 막대: 3시간 간격 8쌍(어제 회색, 오늘 주황).
+ * 1c 메인 시트의 나란한 막대: 3시간 간격 8쌍(어제 회색, 오늘 주황, 오늘 예보는 빗금).
  * 막대 높이는 어제·오늘 합친 범위로 정규화(최소 14px, 최대 126px).
  */
 export function CompareBarChart({ data, nowHour }: { data: DayComparison; nowHour: number }) {
@@ -29,9 +29,9 @@ export function CompareBarChart({ data, nowHour }: { data: DayComparison; nowHou
                   title={`어제 ${hour}시 ${Math.round(data.yesterday[hour].temp)}°`}
                 />
                 <div
-                  className={`w-3 rounded-t ${isNow ? "bg-today-bar-now" : "bg-today-bar"}`}
+                  className={`w-3 rounded-t ${isNow ? "bg-today-bar-now" : "bg-today-bar"} ${isForecastHour(data, hour) ? "bar-forecast" : ""}`}
                   style={{ height: height(data.today[hour].temp) }}
-                  title={`오늘 ${hour}시 ${today}°`}
+                  title={`오늘 ${hour}시 ${today}°${isForecastHour(data, hour) ? " (예보)" : ""}`}
                 />
               </div>
             </div>

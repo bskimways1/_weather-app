@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef } from "react";
+import { Fragment, useEffect, useMemo, useRef } from "react";
 import { ChevronLeft } from "lucide-react";
 import { ErrorRetry } from "@/components/ErrorRetry";
 import { HourlyLineChart } from "@/components/HourlyLineChart";
@@ -81,8 +81,14 @@ export function DetailScreen() {
             const d = diffAt(data, h);
             const isNow = h === now.hour;
             return (
+              <Fragment key={h}>
+              {h > 0 && h - 1 === data.observedThroughHour && (
+                <div className="flex h-7 items-center gap-2 bg-fill px-6 text-[11px] font-semibold text-subtle">
+                  <span className="bar-forecast h-2.5 w-2.5 rounded-[3px] bg-today-bar" />
+                  {h}시부터는 기상청 예보 · 그 전은 관측
+                </div>
+              )}
               <div
-                key={h}
                 ref={isNow ? nowRow : undefined}
                 className={`${COLS} h-12 items-center border-b border-line-soft px-6 ${isNow ? "bg-now-row" : ""}`}
               >
@@ -103,6 +109,7 @@ export function DetailScreen() {
                   </span>
                 </span>
               </div>
+              </Fragment>
             );
           })}
       </main>
