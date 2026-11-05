@@ -38,8 +38,11 @@ function round2(v: number) {
 
 async function getCachedComparison(lat: number, lon: number, dayKey: string): Promise<DayComparison> {
   "use cache";
-  cacheLife({ stale: 300, revalidate: 900, expire: 3600 });
+  const provider = getWeatherProvider();
+  // 기상청은 실시간 관측이라 1분, 예보만 있는 제공자는 15분
+  if (provider.id === "kma") cacheLife({ stale: 30, revalidate: 60, expire: 300 });
+  else cacheLife({ stale: 300, revalidate: 900, expire: 3600 });
   void dayKey; // 캐시 키 용도
-  const [result] = await getWeatherProvider().getComparisons([{ lat, lon }]);
+  const [result] = await provider.getComparisons([{ lat, lon }]);
   return result;
 }

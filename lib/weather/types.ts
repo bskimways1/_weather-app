@@ -21,6 +21,21 @@ export type DayComparison = {
   fetchedAt: number;
   /** 데이터 출처 표기용 */
   source: string;
+  /** 실시간 관측(기상청 AWS). 관측을 못 쓰는 제공자·지역이면 없음 */
+  live?: LiveObservation;
+  /** 오늘 0시~이 시각까지는 관측값, 이후는 예보. 없으면 오늘은 전부 예보 */
+  observedThroughHour?: number;
+};
+
+/** 근처 관측소 값을 거리 가중 평균한 지금 기온 */
+export type LiveObservation = {
+  temp: number;
+  /** 관측 시각, 현지 "YYYY-MM-DDTHH:mm" */
+  observedAt: string;
+  /** 어제 같은 분의 관측 기온 (없으면 null) */
+  yesterdayTemp: number | null;
+  /** 평균에 쓴 관측소. 가까운 순 */
+  stations: { name: string; km: number }[];
 };
 
 export type LatLon = { lat: number; lon: number };
