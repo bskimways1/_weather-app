@@ -37,6 +37,27 @@ export function parseMinute(text: string): { tm: string | null; data: Snapshot }
   return { tm, data };
 }
 
+/** 한 시각의 관측값 [기온 °C, 60분 강수 mm]. 결측이면 null */
+export type HourObs = [number, number] | null;
+
+/**
+ * 관측소 1곳의 매분자료(하루 이내 기간) → 0시~through시 정시 값.
+ * 정시(분=00) 행만 쓰고, 없거나 결측인 시각은 null.
+ */
+export function parseHourly(text: string, through: number): HourObs[] {
+  const out: HourObs[] = Array.from({ length: through + 1 }, () => null);
+  for (const line of rows(text)) {
+    const p = line.split(",");
+    if (p.length < 12 || p[0].length !== 12 || !p[0].endsWith("00")) continue;
+    const h = Number(p[0].slice(8, 10));
+    const ta = Number(p[8]);
+    if (h > through || !Number.isFinite(ta) || ta <= -50) continue;
+    const rn = Number(p[11]);
+    out[h] = [ta, Number.isFinite(rn) && rn > 0 ? rn : 0];
+  }
+  return out;
+}
+
 /** 두 지점 거리(km). 수 km 범위라 평면 근사로 충분 */
 export function distanceKm(a: LatLon, b: LatLon) {
   const r = Math.PI / 180;
