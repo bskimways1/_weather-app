@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { LocationProvider } from "@/components/LocationProvider";
+import { APP_NAME } from "@/lib/appName";
 
 export const metadata: Metadata = {
-  title: "어제랑 날씨",
+  title: APP_NAME,
   description: "시간대별로 어제와 오늘 기온을 비교하는 날씨",
-  appleWebApp: { capable: true, title: "어제랑 날씨", statusBarStyle: "default" },
+  appleWebApp: { capable: true, title: APP_NAME, statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {

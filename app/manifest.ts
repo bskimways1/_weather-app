@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
+import { APP_NAME } from "@/lib/appName";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "어제랑 날씨",
-    short_name: "어제랑 날씨",
+    name: APP_NAME,
+    short_name: APP_NAME,
     description: "시간대별로 어제와 오늘 기온을 비교하는 날씨",
     start_url: "/",
     display: "standalone",
