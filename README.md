@@ -5,7 +5,9 @@
 - GPS로 현재 위치를 잡아 오늘 24시간 기온 예보를 보여주고, 같은 시간대의 어제 기온과 비교한다.
 - 지역 검색과 즐겨찾기를 지원한다.
 
-서비스 주소: https://weather-app-ashen-eight-54.vercel.app
+서비스 주소
+- 기본 (main 브랜치, Open-Meteo): https://weather-app-ashen-eight-54.vercel.app
+- 실시간 Live (`feat/realtime` 브랜치, 기상청 관측): https://eojerang-live.vercel.app
 
 문서: [기능명세서](docs/기능명세서.md) · [서비스명세서](docs/서비스명세서.md)
 
@@ -25,19 +27,20 @@
 app/api/weather      어제·오늘 48시간 기온 (지점 여러 개, 15분 캐시)
 app/api/geo/search   지역 검색 (하루 캐시)
 app/api/geo/reverse  좌표 → 동 이름 (하루 캐시)
-lib/weather/         날씨 제공자 인터페이스 + Open-Meteo 구현
+lib/weather/         날씨 제공자 인터페이스 + Open-Meteo / 기상청(kma) 구현
 lib/geo/             지역 제공자: Kakao(키 있을 때) / Nominatim(기본)
 lib/compare.ts       비교 규칙: 차이 계산·표기·색·척도
 lib/storage.ts       즐겨찾기·최근 검색 (localStorage)
 components/screens/  화면별 클라이언트 컴포넌트
 ```
 
-### 기상청 API로 바꾸려면
-1. `lib/weather/kma.ts` 에 `WeatherProvider` 를 구현한다. 어제 24시간(ASOS 시간자료)과 오늘 24시간(단기예보)을 받아 `DayComparison` 형식으로 돌려주면 된다. 하늘 상태는 WMO 코드로 변환해 `weatherCode` 에 넣는다.
-2. `lib/weather/index.ts` 의 `providers` 에 등록한다.
-3. 환경변수 `WEATHER_PROVIDER=kma` 로 전환한다.
+### 기상청(실시간) 제공자
+`WEATHER_PROVIDER=kma` 와 `KMA_API_KEY`(기상청 API허브 인증키)를 넣으면 기상청 데이터를 쓴다(`lib/weather/kma.ts`).
+- 지금 기온: 근처 AWS 관측소 3곳의 1분 관측을 거리 가중 평균, 1분마다 갱신
+- 어제·오늘 지난 시각: 같은 관측소들의 정시 관측, 오늘 남은 시각: 초단기·단기예보
+- 서버리스(Vercel)에서는 메모리 캐시가 요청마다 사라지므로 공유할 값은 `'use cache: remote'` 로 저장한다.
 
-화면 코드는 `DayComparison` 만 보므로 수정할 필요가 없다.
+자세한 내용은 [서비스명세서](docs/서비스명세서.md) 6.1장, [기능명세서](docs/기능명세서.md) 9장.
 
 ## 개발
 ```bash
@@ -53,6 +56,7 @@ npm run build
 
 ## 데이터 출처와 주의
 - 날씨: [Open-Meteo](https://open-meteo.com) — **무료 API는 비상업용**. 상업 서비스로 공개하려면 유료 플랜이나 기상청 API로 바꾼다. 어제 값은 관측소 실측이 아닌 모델 분석값이다.
+- 날씨(Live): [기상청 API허브](https://apihub.kma.go.kr) — 무료, 일반회원 하루 20,000건, 공공누리. 관측값은 실측이다.
 - 지역: Kakao 키가 없으면 [Nominatim](https://nominatim.org) (OpenStreetMap). 이용 정책상 초당 1회·자동완성 금지라서, 검색은 입력을 마치고 검색 버튼을 누를 때만 보낸다. 서비스 공개 전에는 Kakao 키를 넣는 것을 권장한다.
 
 ## 디자인

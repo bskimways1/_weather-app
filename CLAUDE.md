@@ -51,11 +51,13 @@
 - 오프라인(서비스 워커) 없음, 즐겨찾기 기기 간 동기화 없음.
 - 상업 서비스로 공개하려면 Vercel Pro, 기상청 또는 Open-Meteo 유료, Kakao 키가 필요하다.
 
-## 실시간 버전 (`feat/realtime` 브랜치, 진행 중)
+## 실시간 버전 (`feat/realtime` 브랜치, 운영 중)
+- 2026-11-05 사용자가 폰에서 확인: 지금 기온이 삼성 날씨 앱과 같게 나옴. 명세서 2개·README 에 반영(기능명세서 9장, 서비스명세서 6.1장).
+- 작업 흐름 차이: Live 수정은 `feat/realtime` 에서 하고 **push하면 바로 Live 사이트에 배포**된다(사용자 확인 후 push). main 의 수정이 Live 에도 필요하면 main 을 `feat/realtime` 에 병합한다.
 - 목표: 기능은 그대로, 지금 기온을 기상청 AWS 관측(1분 단위)으로 실시간 반영. 어제는 관측값, 오늘 남은 시간은 단기예보.
 - 삼성 날씨 앱과 직접 연동은 불가(웹은 다른 앱 데이터를 못 읽고, 공개 API 없음) → 기상청 데이터로 대신한다.
 - **운영 방식(A안)**: main(지금 버전)은 그대로 두고, 같은 저장소로 Vercel 프로젝트를 하나 더 만들어 `feat/realtime` 을 그 프로젝트의 운영 브랜치로 쓴다. 주소가 2개(지금 버전 3명 / 새 버전 나머지). 즐겨찾기는 사이트별로 따로 저장된다. 미리보기 주소는 Vercel 로그인이 필요해 친구에게 줄 수 없다.
-  - 실시간 사이트: Vercel 프로젝트 `weather-app-83nb` → https://weather-app-83nb.vercel.app (2026-11-05 생성). Settings → Environments → Production 의 Branch Tracking = `feat/realtime` 이라 **이 브랜치에 push하면 실시간 사이트가 자동 배포**된다. 환경변수: `WEATHER_PROVIDER=kma`, `KMA_API_KEY`, `APP_NAME=어제랑 날씨 Live`.
+  - 실시간 사이트: Vercel 프로젝트 `weather-app-83nb` → **https://eojerang-live.vercel.app** (친구에게 줄 주소, Settings → Domains 에서 추가. `weather-app-live.vercel.app` 은 다른 계정이 써서 불가) / 기본 주소 https://weather-app-83nb.vercel.app (2026-11-05 생성). Settings → Environments → Production 의 Branch Tracking = `feat/realtime` 이라 **이 브랜치에 push하면 실시간 사이트가 자동 배포**된다. 환경변수: `WEATHER_PROVIDER=kma`, `KMA_API_KEY`, `APP_NAME=어제랑 날씨 Live`.
   - `vercel.json` 의 `regions: ["icn1"]`(서울)로 서버 지역을 정했다.
   - 사용자는 Vercel 계정에 2단계 로그인(2FA)을 설정했다. Vercel 로그인·인증 코드 입력은 사용자가 직접 한다.
 - **데이터**: 기상청 API허브(apihub.kma.go.kr) 인증키 하나로 모두 해결(일반회원 하루 20,000건). 환경변수 `KMA_API_KEY`(로컬은 `.env.local`). 공공데이터포털 키는 쓰지 않는다.
