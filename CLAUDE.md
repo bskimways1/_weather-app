@@ -27,6 +27,23 @@
 
 `.claude/` 폴더(로컬 실행 설정)는 커밋하지 않는다.
 
+## 브랜치 현황 (2026-11-06 기준)
+새 브랜치를 만들거나 main 에 합치면 이 표도 고친다.
+
+| 브랜치 | 상태 | 내용 |
+|---|---|---|
+| `main` | **운영 중** | 기본 사이트 https://weather-app-ashen-eight-54.vercel.app (Open-Meteo). push하면 자동 배포 |
+| `feat/realtime` | **운영 중, main 에 합치지 않음** | 실시간 Live 사이트 https://eojerang-live.vercel.app (기상청 관측, Vercel 프로젝트 `weather-app-83nb`). push하면 Live 사이트에 자동 배포. 자세한 내용·결정 사항은 **그 브랜치의 CLAUDE.md** 「실시간 버전」과 명세서(기능명세서 9장, 서비스명세서 6.1장) |
+| `feat/mvp` | main 에 병합됨 | 첫 MVP (5개 화면, 날씨·지역 API, PWA) |
+| `fix/location-privacy` | main 에 병합됨 | GPS 좌표 반올림, 상세 화면 URL에서 좌표 제거 |
+| `docs/specs` | main 에 병합됨 | 기능명세서·서비스명세서 |
+| `docs/claude-md` | main 에 병합됨 | 이 인수인계 메모 |
+| `docs/korean-rule` | main 에 병합됨 | 진행 안내까지 한국어 규칙 |
+| `docs/branch-status` | main 에 병합됨 | 이 브랜치 현황 표 |
+
+- 병합된 브랜치는 기록용으로 남겨 둔다(지우지 않음).
+- 두 사이트를 운영하므로, main 의 수정(버그 수정·공통 기능)이 Live 에도 필요하면 사용자 확인 후 main 을 `feat/realtime` 에 병합하고 push한다.
+
 ## 설계 원칙
 - **날씨 제공자 교체 가능**: 화면은 `DayComparison` 형식만 쓴다. 기상청으로 바꿀 때는 `lib/weather/kma.ts` 에 `WeatherProvider` 를 구현하고 `lib/weather/index.ts` 에 등록, `WEATHER_PROVIDER=kma`. 절차는 서비스명세서 6장.
 - **지역 제공자**: `KAKAO_REST_API_KEY` 가 있으면 Kakao, 없으면 Nominatim. Nominatim 은 이용 정책상 초당 1회·자동완성 금지 → 검색은 엔터를 눌렀을 때만, 서버에서 1.1초 간격으로 호출한다. 이 제한을 풀지 말 것.
