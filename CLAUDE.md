@@ -40,7 +40,7 @@
 | `docs/claude-md` | main 에 병합됨 | 이 인수인계 메모 |
 | `docs/korean-rule` | main 에 병합됨 | 진행 안내까지 한국어 규칙 |
 | `docs/branch-status` | main 에 병합됨 | 이 브랜치 현황 표 |
-| `docs/record-decisions` | 확인 대기 | 새 결정은 그 자리에서 CLAUDE.md 에 적는 규칙 강화 |
+| `docs/record-decisions` | main 에 병합됨 | 새 결정은 그 자리에서 CLAUDE.md 에 적는 규칙 강화 |
 
 - 병합된 브랜치는 기록용으로 남겨 둔다(지우지 않음).
 - 두 사이트를 운영하므로, main 의 수정(버그 수정·공통 기능)이 Live 에도 필요하면 사용자 확인 후 main 을 `feat/realtime` 에 병합하고 push한다.
